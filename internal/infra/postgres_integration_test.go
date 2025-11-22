@@ -7,7 +7,6 @@ import (
     "time"
 
     "github.com/google/uuid"
-    "github.com/jackc/pgx/v5/pgxpool"
     "github.com/testcontainers/testcontainers-go"
     "github.com/testcontainers/testcontainers-go/wait"
 )
