@@ -26,7 +26,6 @@ func NewNATS(cfg Config) (*NATS, error) {
         nats.Name("go-microservice-boilerplate"),
         nats.MaxReconnects(5),
         nats.ReconnectWait(2 * time.Second),
-        nats.MaxPending(int64(cfg.NATSMaxPending)),
     }
     conn, err := nats.Connect(cfg.NATSURL, opts...)
     if err != nil {

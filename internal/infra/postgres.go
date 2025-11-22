@@ -4,11 +4,9 @@ import (
     "context"
     "crypto/tls"
     "fmt"
-    "time"
 
     "github.com/jackc/pgx/v5/pgxpool"
     "github.com/rs/zerolog/log"
-    "github.com/sony/gobreaker"
 )
 
 // NewPostgres creates a pgx connection pool using the provided URL.
@@ -23,7 +21,7 @@ func NewPostgres(url string, cfg Config) (*pgxpool.Pool, error) {
     pcfg.MinConns = int32(cfg.PostgresMinConns)
     // TLS enforcement
     if cfg.PostgresTLS {
-        pcfg.Config.TLSConfig = &tls.Config{MinVersion: tls.VersionTLS12}
+        pcfg.ConnConfig.TLSConfig = &tls.Config{MinVersion: tls.VersionTLS12}
     }
     pool, err := pgxpool.NewWithConfig(context.Background(), pcfg)
     if err != nil {

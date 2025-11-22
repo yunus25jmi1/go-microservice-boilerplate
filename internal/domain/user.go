@@ -1,16 +1,20 @@
 package domain
 
+import "context"
+
+// User represents a user entity
 type User struct {
     ID   string
     Name string
 }
 
+// UserRepository defines the interface for user persistence
 type UserRepository interface {
     GetByID(ctx context.Context, id string) (*User, error)
     Create(ctx context.Context, user *User) error
-    // Add more methods as needed
 }
 
+// UserService handles business logic for users
 type UserService struct {
     repo UserRepository
 }

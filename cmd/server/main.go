@@ -27,6 +27,12 @@ func main() {
     zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
     log.Info().Msg("starting service")
 
+    // Load configuration
+    var cfg infra.Config
+    if err := envconfig.Process("", &cfg); err != nil {
+        log.Fatal().Err(err).Msg("invalid configuration")
+    }
+
     // Initialise infrastructure (DB and optional NATS) concurrently
     var wg sync.WaitGroup
     wg.Add(2)
@@ -73,6 +79,7 @@ func main() {
     r.Get("/healthz", healthHandler)
     r.Handle("/metrics", promhttp.Handler())
     r.Get("/users/{id}", getUserHandler(userService))
+    r.Get("/ping", pingHandler)
 
     srv := &http.Server{Addr: ":8080", Handler: r}
 
@@ -102,6 +109,12 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
     w.Write([]byte(`{"status":"ok"}`))
 }
 
+func pingHandler(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte(`{"ping":"pong"}`))
+}
+
 func getUserHandler(svc domain.UserService) http.HandlerFunc {
     return func(w http.ResponseWriter, r *http.Request) {
         id := chi.URLParam(r, "id")
@@ -110,7 +123,6 @@ func getUserHandler(svc domain.UserService) http.HandlerFunc {
             http.Error(w, err.Error(), http.StatusInternalServerError)
             return
         }
-        // Use zero‑allocation JSON encoder
         resp := struct {
             ID   string `json:"id"`
             Name string `json:"name"`
